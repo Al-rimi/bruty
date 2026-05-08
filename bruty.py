@@ -15,7 +15,7 @@ pyautogui.PAUSE = 0
 
 # Default configuration values - change these to modify defaults everywhere
 DEFAULTS = {
-    'delay_between_boxes': 0.1,
+    'delay_between_boxes': 0.3,
     'delay_between_cycles': 0,
     'delay_between_actions': 0.01,
     'submission_method': 'enter',

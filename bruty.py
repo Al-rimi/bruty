@@ -391,8 +391,8 @@ class SmartPasswordBruteForcer:
         self.delay_between_cycles = delay_between_cycles
         
         print("\n" + "=" * 60)
-        print("SMART MULTI-PASSWORD BRUTE FORCER")
-        print("=" * 60)
+        print("bruty Multi password brute forcing tool")
+        print("=" * 46)
         print(f"Number of select boxes: {len(self.select_boxes)}")
         for idx, pos in enumerate(self.select_boxes, 1):
             print(f"   Box {idx}: {pos}")
@@ -494,7 +494,7 @@ class SmartPasswordBruteForcer:
             passwords_per_minute = (self.attempts_count / elapsed_time) * 60 if elapsed_time > 0 else 0
             print("\n" + "=" * 60)
             print("BRUTE FORCE COMPLETED")
-            print("=" * 60)
+            print("=" * 46)
             print(f"Final progress: {self.get_progress():.2f}%")
             print(f"Total cycles: {self.current_cycle}")
             print(f"Total passwords tried: {self.attempts_count}")
@@ -545,7 +545,7 @@ def setup_select_boxes():
     """Setup multiple select boxes by clicking"""
     print("\n" + "=" * 60)
     print("SETUP SELECT BOXES")
-    print("=" * 60)
+    print("=" * 46)
     
     while True:
         try:
@@ -578,7 +578,7 @@ def setup_select_boxes():
     print("SELECT BOXES CAPTURED SUCCESSFULLY!")
     for idx, pos in enumerate(select_boxes, 1):
         print(f"Box {idx}: {pos}")
-    print("=" * 60)
+    print("=" * 46)
     
     return select_boxes
 
@@ -677,7 +677,7 @@ def view_state(state_file="brute_force_state.json"):
             config = json.load(f)
             print("\n" + "=" * 60)
             print("CURRENT CONFIGURATION")
-            print("=" * 60)
+            print("=" * 46)
             print(f"Select boxes: {len(config.get('select_boxes', []))}")
             for idx, pos in enumerate(config.get('select_boxes', []), 1):
                 print(f"   Box {idx}: {pos}")
@@ -692,20 +692,20 @@ def view_state(state_file="brute_force_state.json"):
             print(f"Include special: {config.get('include_special', False)}")
             print(f"Pending passwords: {len(config.get('pending_passwords', []))}")
             print(f"Last updated: {config.get('last_updated', 'Unknown')}")
-            print("=" * 60)
+            print("=" * 46)
     
     if os.path.exists(state_file):
         with open(state_file, 'r') as f:
             data = json.load(f)
             print("\n" + "=" * 60)
             print("CURRENT STATE")
-            print("=" * 60)
+            print("=" * 46)
             print(f"Cycles completed: {data.get('current_cycle', 0)}")
             print(f"Passwords tried: {data.get('attempts_count', 0)}")
             print(f"Pending passwords: {len(data.get('pending_passwords', []))}")
             print(f"Remaining: {data.get('remaining', 'Unknown')}")
             print(f"Last updated: {data.get('last_updated', 'Unknown')}")
-            print("=" * 60)
+            print("=" * 46)
             
             # Show last 10 attempts
             log_file = "attempts_log.txt"
@@ -752,7 +752,7 @@ if __name__ == "__main__":
     # pip install pyautogui keyboard pynput
     
     print("MULTI-PASSWORD BRUTE FORCER")
-    print("=" * 60)
+    print("=" * 46)
     print("\nMENU:")
     print("1. Start brute force")
     print("2. View current progress and configuration")

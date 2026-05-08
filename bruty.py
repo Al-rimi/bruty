@@ -15,9 +15,9 @@ pyautogui.PAUSE = 0
 
 # Default configuration values - change these to modify defaults everywhere
 DEFAULTS = {
-    'delay_between_boxes': 0.3,
+    'delay_between_boxes': 0,
     'delay_between_cycles': 0,
-    'delay_between_actions': 0.01,
+    'delay_between_actions': 0.02,
     'submission_method': 'enter',
     'submit_button_pos': None,
     'password_length': 4,
@@ -256,18 +256,24 @@ class SmartPasswordBruteForcer:
             time.sleep(self.delay_between_actions)
         
         # Quick verify - be less intrusive
-        time.sleep(0.01)  # Small delay before verification
         pyautogui.hotkey('ctrl', 'a')
-        time.sleep(0.01)
-        pyautogui.hotkey('ctrl', 'c')
-        time.sleep(0.01)  # Small delay for clipboard
-        pasted_text = pyperclip.paste()
+
+        if self.delay_between_actions > 0:
+            time.sleep(self.delay_between_actions)
         
+        pyautogui.hotkey('ctrl', 'c')
+
+        if self.delay_between_actions > 0:
+            time.sleep(self.delay_between_actions)
+
+        pasted_text = pyperclip.paste()
+
+        if self.delay_between_actions > 0:
+            time.sleep(self.delay_between_actions)
+
+        pyautogui.click(box_position[0], box_position[1])
+
         if pasted_text == password:
-            # Ensure input field is focused after verification
-            pyautogui.click(box_position[0], box_position[1])
-            if self.delay_between_actions > 0:
-                time.sleep(self.delay_between_actions)
             return True
         
         # Position adjustment: retry finding working position if enabled
@@ -354,7 +360,6 @@ class SmartPasswordBruteForcer:
             
             if success:
                 # Ensure input field is focused and ready for submission
-                time.sleep(0.05)  # Give time for any JavaScript processing
                 pyautogui.click(box_pos[0], box_pos[1])  # Refocus the input field
                 if self.delay_between_actions > 0:
                     time.sleep(self.delay_between_actions)
@@ -363,7 +368,7 @@ class SmartPasswordBruteForcer:
                 print(f"✓ Success box {idx}/{len(self.select_boxes)}: '{password}'")
                 retry_password = None  # Clear any retry password since we succeeded
             else:
-                print(f"⚠  Failed box {idx}/{len(self.select_boxes)}: '{password}' - Skipping")
+                # print(f"⚠  Failed box {idx}/{len(self.select_boxes)}: '{password}' - Skipping")
                 # This password will be retried in the next box
                 retry_password = password
                 remaining_passwords.append(password)
@@ -390,9 +395,9 @@ class SmartPasswordBruteForcer:
         self.delay_between_boxes = delay_between_boxes
         self.delay_between_cycles = delay_between_cycles
         
-        print("\n" + "=" * 60)
+        print("\n" + "=" * 40)
         print("bruty Multi password brute forcing tool")
-        print("=" * 46)
+        print("=" * 40)
         print(f"Number of select boxes: {len(self.select_boxes)}")
         for idx, pos in enumerate(self.select_boxes, 1):
             print(f"   Box {idx}: {pos}")
@@ -491,10 +496,10 @@ class SmartPasswordBruteForcer:
             # Print summary
             elapsed_time = time.time() - start_time
             avg_cycle_time = elapsed_time / self.current_cycle if self.current_cycle > 0 else 0
-            passwords_per_minute = (self.attempts_count / elapsed_time) * 60 if elapsed_time > 0 else 0
-            print("\n" + "=" * 60)
+            passwords_per_minute = (self.attempts_count / elapsed_time) * 40 if elapsed_time > 0 else 0
+            print("\n" + "=" * 40)
             print("BRUTE FORCE COMPLETED")
-            print("=" * 46)
+            print("=" * 40)
             print(f"Final progress: {self.get_progress():.2f}%")
             print(f"Total cycles: {self.current_cycle}")
             print(f"Total passwords tried: {self.attempts_count}")
@@ -543,9 +548,9 @@ def capture_click_position(prompt_message, box_number=None):
 
 def setup_select_boxes():
     """Setup multiple select boxes by clicking"""
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 40)
     print("SETUP SELECT BOXES")
-    print("=" * 46)
+    print("=" * 40)
     
     while True:
         try:
@@ -574,11 +579,11 @@ def setup_select_boxes():
         print("\nNo select boxes selected. Exiting setup.")
         return None
     
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 40)
     print("SELECT BOXES CAPTURED SUCCESSFULLY!")
     for idx, pos in enumerate(select_boxes, 1):
         print(f"Box {idx}: {pos}")
-    print("=" * 46)
+    print("=" * 40)
     
     return select_boxes
 
@@ -675,9 +680,9 @@ def view_state(state_file="brute_force_state.json"):
     if os.path.exists(config_file):
         with open(config_file, 'r') as f:
             config = json.load(f)
-            print("\n" + "=" * 60)
+            print("\n" + "=" * 40)
             print("CURRENT CONFIGURATION")
-            print("=" * 46)
+            print("=" * 40)
             print(f"Select boxes: {len(config.get('select_boxes', []))}")
             for idx, pos in enumerate(config.get('select_boxes', []), 1):
                 print(f"   Box {idx}: {pos}")
@@ -692,20 +697,20 @@ def view_state(state_file="brute_force_state.json"):
             print(f"Include special: {config.get('include_special', False)}")
             print(f"Pending passwords: {len(config.get('pending_passwords', []))}")
             print(f"Last updated: {config.get('last_updated', 'Unknown')}")
-            print("=" * 46)
+            print("=" * 40)
     
     if os.path.exists(state_file):
         with open(state_file, 'r') as f:
             data = json.load(f)
-            print("\n" + "=" * 60)
+            print("\n" + "=" * 40)
             print("CURRENT STATE")
-            print("=" * 46)
+            print("=" * 40)
             print(f"Cycles completed: {data.get('current_cycle', 0)}")
             print(f"Passwords tried: {data.get('attempts_count', 0)}")
             print(f"Pending passwords: {len(data.get('pending_passwords', []))}")
             print(f"Remaining: {data.get('remaining', 'Unknown')}")
             print(f"Last updated: {data.get('last_updated', 'Unknown')}")
-            print("=" * 46)
+            print("=" * 40)
             
             # Show last 10 attempts
             log_file = "attempts_log.txt"
@@ -752,7 +757,7 @@ if __name__ == "__main__":
     # pip install pyautogui keyboard pynput
     
     print("MULTI-PASSWORD BRUTE FORCER")
-    print("=" * 46)
+    print("=" * 40)
     print("\nMENU:")
     print("1. Start brute force")
     print("2. View current progress and configuration")

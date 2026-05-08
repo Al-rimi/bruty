@@ -327,14 +327,23 @@ class SmartPasswordBruteForcer:
 
         successful_passwords = []
         remaining_passwords = []
-        current_password_index = 0
+        
+        # Track failed passwords that can be retried in subsequent boxes
+        retry_password = None
         
         for idx, box_pos in enumerate(self.select_boxes, 1):
-            if current_password_index >= len(passwords):
-                print(f"   ⚠ Skipped box {idx}: No more passwords")
+            # Determine which password to try for this box
+            if retry_password is not None:
+                # Use the retry password from a previous failed box
+                password = retry_password
+                retry_password = None  # Clear it after use
+            elif idx-1 < len(passwords):
+                # Use the assigned password for this box
+                password = passwords[idx-1]
+            else:
+                print(f"⚠ Skipped box {idx}: No password available")
                 continue
             
-            password = passwords[current_password_index]
             success = self.type_password(password, box_pos)
             
             if success:
@@ -345,19 +354,19 @@ class SmartPasswordBruteForcer:
                     time.sleep(self.delay_between_actions)
                 self.submit_form()
                 successful_passwords.append(password)
-                print(f"   ✓ Success box {idx}/{len(self.select_boxes)}: '{password}'")
-                current_password_index += 1
+                print(f"✓ Success box {idx}/{len(self.select_boxes)}: '{password}'")
+                retry_password = None  # Clear any retry password since we succeeded
             else:
-                print(f"  ⚠  Failed box {idx}/{len(self.select_boxes)}: '{password}' - Skipping")
-                # Keep password for retry in next cycle
+                print(f"⚠  Failed box {idx}/{len(self.select_boxes)}: '{password}' - Skipping")
+                # This password will be retried in the next box
+                retry_password = password
                 remaining_passwords.append(password)
-                current_password_index += 1  # Still move to next password
             
             # Apply delay between boxes (if configured and not the last box)
             if idx < len(self.select_boxes) and self.delay_between_boxes > 0:
                 time.sleep(self.delay_between_boxes)
         
-        print(f"   Cycle completed: {len(successful_passwords)} ✓ | {len(remaining_passwords)} ⚠")
+        print(f"Cycle completed: {len(successful_passwords)} ✓ | {len(remaining_passwords)} ⚠")
         return successful_passwords, remaining_passwords
     
     def brute_force(self, delay_between_boxes=0.05, delay_between_cycles=1):
@@ -447,9 +456,8 @@ class SmartPasswordBruteForcer:
                 remaining_combinations = len(self.all_combinations) - len(self.used_combinations)
                 remaining_cycles = remaining_combinations / len(self.select_boxes) if len(self.select_boxes) > 0 else 0
                 estimated_remaining_time = remaining_cycles * avg_cycle_time
-                print(f"Progress: {progress:.2f}% | Remaining combinations: {remaining_combinations}")
-                print(f"Elapsed time: {elapsed/60:.2f}min | Remaining time: {estimated_remaining_time/60:.2f}min | Avg cycle: {avg_cycle_time:.2f} s")
-                print(f"[Cycle {self.current_cycle}]")
+                print(f"Elapsed: {elapsed/60:.0f}min | Remaining: {estimated_remaining_time/60:.0f}min | Cycle: {avg_cycle_time:.2f}s")
+                print(f"Cycle {self.current_cycle} | Progress: {progress:.2f}% | Remaining combinations: {remaining_combinations}")
                 # Log the successful attempt
                 if successful_passwords:
                     self.log_attempt(successful_passwords, self.current_cycle, success=True)
@@ -740,7 +748,7 @@ if __name__ == "__main__":
     
     choice = input("\nSelect option (1-6): ").strip()
     
-    if choice == '1':
+    if choice == '1' or choice == '':
         forcer = SmartPasswordBruteForcer()
         if os.path.exists('.config'):
             print("Using saved configuration.")

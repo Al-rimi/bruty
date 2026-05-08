@@ -315,11 +315,8 @@ class SmartPasswordBruteForcer:
     def stop_script(self):
         """Stop the brute force process"""
         self.running = False
-        print(f"Final progress: {self.get_progress():.2f}%")
-        print(f"Total cycles completed: {self.current_cycle}")
-        print(f"Total passwords tried: {self.attempts_count}")
         self.save_state()
-        print("State saved. You can resume later by running the script again!")
+        print("State saved. Resume by running the script again!")
     
     def execute_attempt_cycle(self, passwords):
         """Execute a full cycle of typing multiple passwords into multiple select boxes"""
@@ -378,8 +375,8 @@ class SmartPasswordBruteForcer:
             # Apply delay between boxes (if configured and not the last box)
             if idx < len(self.select_boxes) and self.delay_between_boxes > 0:
                 time.sleep(self.delay_between_boxes)
-        
-        print(f"Cycle completed: {len(successful_passwords)} ✓ | {len(remaining_passwords)} ⚠")
+        if self.running:
+            print(f"Cycle completed: {len(successful_passwords)} ✓ | {len(remaining_passwords)} ⚠")
         return successful_passwords, remaining_passwords
     
     def brute_force(self, delay_between_boxes=0.05, delay_between_cycles=1):
@@ -454,6 +451,10 @@ class SmartPasswordBruteForcer:
                 # Execute the attempt cycle
                 successful_passwords, remaining_passwords = self.execute_attempt_cycle(passwords)
                 
+                # Check if we should stop after completing this cycle
+                if not self.running:
+                    break
+                
                 # Add only successful passwords to used set
                 for pwd in successful_passwords:
                     self.used_combinations.add(pwd)
@@ -494,6 +495,7 @@ class SmartPasswordBruteForcer:
             print("\n" + "=" * 60)
             print("BRUTE FORCE COMPLETED")
             print("=" * 60)
+            print(f"Final progress: {self.get_progress():.2f}%")
             print(f"Total cycles: {self.current_cycle}")
             print(f"Total passwords tried: {self.attempts_count}")
             print(f"Remaining passwords: {len(self.all_combinations) - len(self.used_combinations)}")

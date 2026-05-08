@@ -315,7 +315,6 @@ class SmartPasswordBruteForcer:
     def stop_script(self):
         """Stop the brute force process"""
         self.running = False
-        print("\n\nStopping script...")
         print(f"Final progress: {self.get_progress():.2f}%")
         print(f"Total cycles completed: {self.current_cycle}")
         print(f"Total passwords tried: {self.attempts_count}")
@@ -332,6 +331,10 @@ class SmartPasswordBruteForcer:
         retry_password = None
         
         for idx, box_pos in enumerate(self.select_boxes, 1):
+            # Check if we should stop immediately
+            if not self.running:
+                break
+                
             # Determine which password to try for this box
             if retry_password is not None:
                 # Use the retry password from a previous failed box
@@ -341,10 +344,16 @@ class SmartPasswordBruteForcer:
                 # Use the assigned password for this box
                 password = passwords[idx-1]
             else:
-                print(f"⚠ Skipped box {idx}: No password available")
+                print(f"   ⚠ Skipped box {idx}: No password available")
                 continue
             
             success = self.type_password(password, box_pos)
+            
+            # Check again if we should stop (in case it was triggered during type_password)
+            if not self.running:
+                if not success:
+                    remaining_passwords.append(password)
+                break
             
             if success:
                 # Ensure input field is focused and ready for submission
@@ -361,6 +370,10 @@ class SmartPasswordBruteForcer:
                 # This password will be retried in the next box
                 retry_password = password
                 remaining_passwords.append(password)
+            
+            # Check if we should stop after processing this box
+            if not self.running:
+                break
             
             # Apply delay between boxes (if configured and not the last box)
             if idx < len(self.select_boxes) and self.delay_between_boxes > 0:

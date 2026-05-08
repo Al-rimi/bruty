@@ -470,8 +470,8 @@ class SmartPasswordBruteForcer:
                 remaining_combinations = len(self.all_combinations) - len(self.used_combinations)
                 remaining_cycles = remaining_combinations / len(self.select_boxes) if len(self.select_boxes) > 0 else 0
                 estimated_remaining_time = remaining_cycles * avg_cycle_time
-                print(f"Elapsed: {elapsed/60:.0f}min | Remaining: {estimated_remaining_time/60:.0f}min | Cycle: {avg_cycle_time:.2f}s")
-                print(f"Cycle {self.current_cycle} | Progress: {progress:.2f}% | Remaining combinations: {remaining_combinations}")
+                print(f"Elapsed: {elapsed/60:.0f}/{estimated_remaining_time/60:.0f}min | Cycle: {avg_cycle_time:.2f}s")
+                print(f"Cycle {self.current_cycle}/{int(remaining_cycles)} | Progress: {progress:.2f}%")
                 # Log the successful attempt
                 if successful_passwords:
                     self.log_attempt(successful_passwords, self.current_cycle, success=True)

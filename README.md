@@ -2,7 +2,7 @@
   <img src="logo.png" alt="Bruty Logo" width="200">
 </p>
 
-# Bruty - Multi-Box Smart Password Brute Forcer
+# Multi Password Brute Forcer
 
 A Python automation tool designed to perform intelligent brute-force attacks on multi-input forms (e.g. PIN pads, password grids, etc.) using pyautogui.
 

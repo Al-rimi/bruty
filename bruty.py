@@ -424,7 +424,7 @@ class SmartPasswordBruteForcer:
         self.delay_between_cycles = delay_between_cycles
                 
         print("=" * 52)
-        print("BRUTY - Multi-Password Brute Forcer")
+        print(' '* 12 + "Multi Password Brute Forcer")
         print("=" * 52)
         print("   ETHICAL USE ONLY - Authorized Testing Only")
         print("   Unauthorized use is illegal. Author not responsible.")
@@ -797,7 +797,7 @@ if __name__ == "__main__":
     # Install required libraries first:
     # pip install pyautogui keyboard pynput
     print(logo_ascii)
-    print(' '* 8 + "BRUTY - Multi-Password Brute Forcer")
+    print(' '* 12 + "Multi Password Brute Forcer")
     print("=" * 52)
     print("   This tool is for authorized testing only.")
     print("   Misuse is strictly prohibited.")

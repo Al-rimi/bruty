@@ -24,6 +24,16 @@ import pyperclip
 pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0
 
+logo_ascii = r"""     
+  +++                          +++                
+  +++++++      ++++  ++   +++  +++++++  ++    ++  
+  +++++++++  ++++++ +++   +++  ++++++   +++  +++  
+  +++   +++  +++    +++   +++  +++      +++  +++  
+  +++++++++  +++     ++++++++   ++++++  ++++++++  
+     +++      +        +++        +++     ++++++  
+                                          ++++    
+"""
+
 # Default configuration values - change these to modify defaults everywhere
 DEFAULTS = {
     'delay_between_boxes': 0,
@@ -413,12 +423,12 @@ class SmartPasswordBruteForcer:
         self.delay_between_boxes = delay_between_boxes
         self.delay_between_cycles = delay_between_cycles
                 
-        print("\n" + "=" * 40)
+        print("=" * 52)
         print("BRUTY - Multi-Password Brute Forcer")
-        print("=" * 40)
+        print("=" * 52)
         print("   ETHICAL USE ONLY - Authorized Testing Only")
         print("   Unauthorized use is illegal. Author not responsible.")
-        print("=" * 40)
+        print("=" * 52)
         print(f"Number of select boxes: {len(self.select_boxes)}")
         for idx, pos in enumerate(self.select_boxes, 1):
             print(f"   Box {idx}: {pos}")
@@ -520,10 +530,10 @@ class SmartPasswordBruteForcer:
             # Print summary
             elapsed_time = time.time() - start_time
             avg_cycle_time = elapsed_time / self.current_cycle if self.current_cycle > 0 else 0
-            passwords_per_minute = (self.attempts_count / elapsed_time) * 40 if elapsed_time > 0 else 0
-            print("\n" + "=" * 40)
+            passwords_per_minute = (self.attempts_count / elapsed_time) * 52 if elapsed_time > 0 else 0
+            print("\n" + "=" * 52)
             print("BRUTE FORCE COMPLETED")
-            print("=" * 40)
+            print("=" * 52)
             print(f"Final progress: {self.get_progress():.2f}%")
             print(f"Total cycles: {self.current_cycle}")
             total_attempts = self.total_attempts
@@ -578,9 +588,9 @@ def capture_click_position(prompt_message, box_number=None):
 
 def setup_select_boxes():
     """Setup multiple select boxes by clicking"""
-    print("\n" + "=" * 40)
+    print("\n" + "=" * 52)
     print("SETUP SELECT BOXES")
-    print("=" * 40)
+    print("=" * 52)
     
     while True:
         try:
@@ -609,11 +619,11 @@ def setup_select_boxes():
         print("\nNo select boxes selected. Exiting setup.")
         return None
     
-    print("\n" + "=" * 40)
+    print("\n" + "=" * 52)
     print("SELECT BOXES CAPTURED SUCCESSFULLY!")
     for idx, pos in enumerate(select_boxes, 1):
         print(f"Box {idx}: {pos}")
-    print("=" * 40)
+    print("=" * 52)
     
     return select_boxes
 
@@ -710,9 +720,9 @@ def view_state(state_file="brute_force_state.json"):
     if os.path.exists(config_file):
         with open(config_file, 'r') as f:
             config = json.load(f)
-            print("\n" + "=" * 40)
+            print("\n" + "=" * 52)
             print("CURRENT CONFIGURATION")
-            print("=" * 40)
+            print("=" * 52)
             print(f"Select boxes: {len(config.get('select_boxes', []))}")
             for idx, pos in enumerate(config.get('select_boxes', []), 1):
                 print(f"   Box {idx}: {pos}")
@@ -727,21 +737,21 @@ def view_state(state_file="brute_force_state.json"):
             print(f"Include special: {config.get('include_special', False)}")
             print(f"Pending passwords: {len(config.get('pending_passwords', []))}")
             print(f"Last updated: {config.get('last_updated', 'Unknown')}")
-            print("=" * 40)
+            print("=" * 52)
     
     if os.path.exists(state_file):
         with open(state_file, 'r') as f:
             data = json.load(f)
-            print("\n" + "=" * 40)
+            print("\n" + "=" * 52)
             print("CURRENT STATE")
-            print("=" * 40)
+            print("=" * 52)
             print(f"Cycles completed: {data.get('current_cycle', 0)}")
             print(f"Passwords tried: {data.get('attempts_count', 0)}")
             print(f"Total attempts: {data.get('total_attempts', 0)}")
             print(f"Pending passwords: {len(data.get('pending_passwords', []))}")
             print(f"Remaining: {data.get('remaining', 'Unknown')}")
             print(f"Last updated: {data.get('last_updated', 'Unknown')}")
-            print("=" * 40)
+            print("=" * 52)
             
             # Show last 10 attempts
             log_file = "attempts_log.txt"
@@ -786,10 +796,10 @@ def live_coordinates():
 if __name__ == "__main__":
     # Install required libraries first:
     # pip install pyautogui keyboard pynput
-    
-    print("BRUTY - Multi-Password Brute Forcer")
-    print("=" * 40)
-    print("   This tool is for ethical hacking / authorized testing only.")
+    print(logo_ascii)
+    print(' '* 8 + "BRUTY - Multi-Password Brute Forcer")
+    print("=" * 52)
+    print("   This tool is for authorized testing only.")
     print("   Misuse is strictly prohibited.")
     print("\nMENU:")
     print("1. Start brute force")

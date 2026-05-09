@@ -1,3 +1,14 @@
+"""
+BRUTY - Smart Multi-Box Brute Forcer
+
+LEGAL & ETHICAL WARNING
+This tool is for **ethical hacking and authorized security testing only**.
+You are responsible for ensuring you have explicit permission before testing
+any system. Unauthorized use is illegal.
+
+The author is not liable for any misuse or damage caused by this software.
+"""
+
 import pyautogui
 import random
 import json
@@ -17,7 +28,7 @@ pyautogui.PAUSE = 0
 DEFAULTS = {
     'delay_between_boxes': 0,
     'delay_between_cycles': 0,
-    'delay_between_actions': 0.02,
+    'delay_between_actions': 0.013,
     'submission_method': 'enter',
     'submit_button_pos': None,
     'password_length': 4,
@@ -37,6 +48,7 @@ class SmartPasswordBruteForcer:
         self.used_combinations = set()
         self.all_combinations = set(f"{i:04d}" for i in range(10000))
         self.attempts_count = 0
+        self.total_attempts = 0  # Track total attempts made
         self.current_passwords = []  # Store multiple passwords for each cycle
         self.running = True
         self.select_boxes = []  # Store positions of select boxes
@@ -129,6 +141,9 @@ class SmartPasswordBruteForcer:
                     data = json.load(f)
                     self.used_combinations = set(data.get('used_combinations', []))
                     self.attempts_count = data.get('attempts_count', 0)
+                    self.total_attempts = data.get('total_attempts', 0)
+                    if self.total_attempts < self.attempts_count:
+                        self.total_attempts = self.attempts_count  # Ensure total_attempts >= attempts_count for old states
                     self.select_boxes = data.get('select_boxes', [])
                     self.pending_passwords = data.get('pending_passwords', [])
                     print(f"Loaded previous state: {self.attempts_count} attempts already made")
@@ -146,6 +161,7 @@ class SmartPasswordBruteForcer:
             data = {
                 'used_combinations': list(self.used_combinations),
                 'attempts_count': self.attempts_count,
+                'total_attempts': self.total_attempts,
                 'select_boxes': self.select_boxes,
                 'pending_passwords': self.pending_passwords,
                 'last_updated': datetime.now().isoformat(),
@@ -365,13 +381,17 @@ class SmartPasswordBruteForcer:
                     time.sleep(self.delay_between_actions)
                 self.submit_form()
                 successful_passwords.append(password)
+                if password in remaining_passwords:
+                    remaining_passwords.remove(password)
                 print(f"✓ Success box {idx}/{len(self.select_boxes)}: '{password}'")
                 retry_password = None  # Clear any retry password since we succeeded
             else:
+                # Remove the comment if needed to see failed attempts
                 # print(f"⚠  Failed box {idx}/{len(self.select_boxes)}: '{password}' - Skipping")
                 # This password will be retried in the next box
                 retry_password = password
-                remaining_passwords.append(password)
+                if password not in remaining_passwords:
+                    remaining_passwords.append(password)
             
             # Check if we should stop after processing this box
             if not self.running:
@@ -380,8 +400,6 @@ class SmartPasswordBruteForcer:
             # Apply delay between boxes (if configured and not the last box)
             if idx < len(self.select_boxes) and self.delay_between_boxes > 0:
                 time.sleep(self.delay_between_boxes)
-        if self.running:
-            print(f"Cycle completed: {len(successful_passwords)} ✓ | {len(remaining_passwords)} ⚠")
         return successful_passwords, remaining_passwords
     
     def brute_force(self, delay_between_boxes=0.05, delay_between_cycles=1):
@@ -394,9 +412,12 @@ class SmartPasswordBruteForcer:
         """
         self.delay_between_boxes = delay_between_boxes
         self.delay_between_cycles = delay_between_cycles
-        
+                
         print("\n" + "=" * 40)
-        print("bruty Multi password brute forcing tool")
+        print("BRUTY - Multi-Password Brute Forcer")
+        print("=" * 40)
+        print("   ETHICAL USE ONLY - Authorized Testing Only")
+        print("   Unauthorized use is illegal. Author not responsible.")
         print("=" * 40)
         print(f"Number of select boxes: {len(self.select_boxes)}")
         for idx, pos in enumerate(self.select_boxes, 1):
@@ -456,6 +477,9 @@ class SmartPasswordBruteForcer:
                 # Execute the attempt cycle
                 successful_passwords, remaining_passwords = self.execute_attempt_cycle(passwords)
                 
+                # Update total attempts
+                self.total_attempts += len(self.select_boxes)
+                
                 # Check if we should stop after completing this cycle
                 if not self.running:
                     break
@@ -473,10 +497,10 @@ class SmartPasswordBruteForcer:
                 elapsed = time.time() - start_time
                 avg_cycle_time = elapsed / self.current_cycle if self.current_cycle > 0 else 0
                 remaining_combinations = len(self.all_combinations) - len(self.used_combinations)
-                remaining_cycles = remaining_combinations / len(self.select_boxes) if len(self.select_boxes) > 0 else 0
+                avg_successes_per_cycle = self.attempts_count / self.current_cycle if self.current_cycle > 0 else len(self.select_boxes)
+                remaining_cycles = remaining_combinations / avg_successes_per_cycle if avg_successes_per_cycle > 0 else 0
                 estimated_remaining_time = remaining_cycles * avg_cycle_time
-                print(f"Elapsed: {elapsed/60:.0f}/{estimated_remaining_time/60:.0f}min | Cycle: {avg_cycle_time:.2f}s")
-                print(f"Cycle {self.current_cycle}/{int(remaining_cycles)} | Progress: {progress:.2f}%")
+                print(f"{progress:.2f}% | {elapsed/60:.0f}/{estimated_remaining_time/60:.0f}min | {int(remaining_cycles)} cycles")
                 # Log the successful attempt
                 if successful_passwords:
                     self.log_attempt(successful_passwords, self.current_cycle, success=True)
@@ -502,7 +526,13 @@ class SmartPasswordBruteForcer:
             print("=" * 40)
             print(f"Final progress: {self.get_progress():.2f}%")
             print(f"Total cycles: {self.current_cycle}")
-            print(f"Total passwords tried: {self.attempts_count}")
+            total_attempts = self.total_attempts
+            failed_attempts = total_attempts - self.attempts_count
+            success_rate = (self.attempts_count / total_attempts * 100) if total_attempts > 0 else 0
+            print(f"Total attempts: {total_attempts}")
+            print(f"Successful attempts: {self.attempts_count}")
+            print(f"Failed attempts: {failed_attempts}")
+            print(f"Success rate: {success_rate:.2f}%")
             print(f"Remaining passwords: {len(self.all_combinations) - len(self.used_combinations)}")
             print(f"Time elapsed: {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
             print(f"Average cycle time: {avg_cycle_time:.2f} seconds")
@@ -707,6 +737,7 @@ def view_state(state_file="brute_force_state.json"):
             print("=" * 40)
             print(f"Cycles completed: {data.get('current_cycle', 0)}")
             print(f"Passwords tried: {data.get('attempts_count', 0)}")
+            print(f"Total attempts: {data.get('total_attempts', 0)}")
             print(f"Pending passwords: {len(data.get('pending_passwords', []))}")
             print(f"Remaining: {data.get('remaining', 'Unknown')}")
             print(f"Last updated: {data.get('last_updated', 'Unknown')}")
@@ -756,8 +787,10 @@ if __name__ == "__main__":
     # Install required libraries first:
     # pip install pyautogui keyboard pynput
     
-    print("MULTI-PASSWORD BRUTE FORCER")
+    print("BRUTY - Multi-Password Brute Forcer")
     print("=" * 40)
+    print("   This tool is for ethical hacking / authorized testing only.")
+    print("   Misuse is strictly prohibited.")
     print("\nMENU:")
     print("1. Start brute force")
     print("2. View current progress and configuration")
